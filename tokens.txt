@@ -1,0 +1,13 @@
+Inicio 	 	 KEYWORD	 	 INICIO 
+Mientras 	 	 KEYWORD	 	 instMientras 
+(	 	 PARENTHESIS_IZQUIERDO 
+b	 	 IDENTIFICADOR 
+* 	 	 opBinario	 	  MULTIPLY
+a	 	 IDENTIFICADOR 
+==	 	 opBinario	 	  EQUAL
+0	 	 ENTERO 
+)	 	 PARENTHESIS_DERECHO 
+x	 	 IDENTIFICADOR 
+=  	 	 ASIGNACION	 	 ASIGNMENT_OPERATOR
+14	 	 ENTERO 
+Final 	 	 KEYWORD	 	 FINAL 
