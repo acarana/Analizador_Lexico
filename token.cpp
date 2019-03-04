@@ -404,14 +404,14 @@ ErrorCode GetToken(string file, int& i, FILE out, token& tokeru)
                 {
                     case opBinario :
 
-                            str =  tokeru.TokenString + "              \t "+ TokenTypesSTR[tokeru.TokenType] + "              \t " + OperatorSTR[tokeru.operatorID]  + "\n";
+                            str =  tokeru.TokenString + "\t \t "+ TokenTypesSTR[tokeru.TokenType] + "\t \t " + OperatorSTR[tokeru.operatorID]  + "\n";
                             break;
                      case KEYWORD :
 
-                            str = tokeru.TokenString + "              \t "+TokenTypesSTR[tokeru.TokenType] + "              \t " + KeywordSTR[tokeru.keyID]+" \n" ;
+                            str = tokeru.TokenString + "\t \t "+TokenTypesSTR[tokeru.TokenType] + "\t \t " + KeywordSTR[tokeru.keyID]+" \n" ;
                             break;
                      case ASIGNACION :
-                         str =  tokeru.TokenString + "              \t "+ TokenTypesSTR[tokeru.TokenType] + "              \t " + OperatorSTR[tokeru.operatorID]  + "\n";
+                         str =  tokeru.TokenString + "\t \t "+ TokenTypesSTR[tokeru.TokenType] + "\t \t " + OperatorSTR[tokeru.operatorID]  + "\n";
                          break ;
                      case START_COMMENT:
                          break;
@@ -423,7 +423,7 @@ ErrorCode GetToken(string file, int& i, FILE out, token& tokeru)
                      default :
 
 
-                            str =  tokeru.TokenString+ "              \t " + TokenTypesSTR[tokeru.TokenType] + " \n" ;
+                            str =  tokeru.TokenString+ "\t \t " + TokenTypesSTR[tokeru.TokenType] + " \n" ;
                             break;
                 }
    pFile = fopen ("tokens.txt","a");
