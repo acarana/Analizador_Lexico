@@ -1,7 +1,6 @@
-Inicio
-Mientras ( b * a == 0 )
-
-x = 14
-
-// bla bla
-Final
+inicio
+Mientras (pi + vol == 00 )
+pi = 1 ;
+vol = 13 ;
+finmientras
+final

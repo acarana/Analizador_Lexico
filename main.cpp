@@ -2,8 +2,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include "Token.h"
+#include "token.h"
 #include "Reserved.h"
+#include "Syntactic.h"
 using namespace std;
 
 
@@ -42,5 +43,5 @@ int main()
 
             fclose (pFile);
 
-
+            Analyze();
     }

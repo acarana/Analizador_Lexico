@@ -6,35 +6,36 @@ using namespace std;
 
 enum Keywords {SI, SINO, instMientras, instEscribe, INICIO, FINAL, finMientras, finSi};
 
-enum ErrorCode { NO_ERROR, UNKNOWN_CHAR, ILLEGAL_ESCAPE_CHAR, END_OF_COMMENT_NOT_FOUND};
-
-enum States { START,END, COMMENT_FOUND1, COMMENT_FOUND2, IDENTIFIER_FOUND, CHAR_FOUND1,
-              CHAR_FOUND2, STRING_FOUND, STRING_FOUND1, STRING_FOUND2, STRING_ESCAPE,
+enum States { START,END, COMMENT_FOUND1, COMMENT_FOUND2, IDENTIFIER_FOUND,
               INTEGER_FOUND, OPERATOR_FOUND};
 
-enum TokenTypes { UNDEFINED, LINE_COMMENT, START_COMMENT, END_COMMENT, IDENTIFICADOR,
-                  KEYWORD, CHAR, ENTERO, STRING, opBinario, ASIGNACION, COMMA,
-                  PARENTHESIS_IZQUIERDO, PARENTHESIS_DERECHO};
+enum TokenTypes { ERROR, UNDEFINED, LINE_COMMENT, START_COMMENT, END_COMMENT, IDENTIFICADOR,
+                  RESERVADA, ENTERO, opBinario, ASIGNACION,
+                  PARENTHESIS_IZQUIERDO, PARENTHESIS_DERECHO, DELIMITADOR};
 
-enum Operators { NEGATIVE, INCREMENT, DECREASE, NOT,
-                ASIGNMENT_OPERATOR, ADD, MULTIPLY, SUBSTRACT, DIVIDE,
-                EQUAL, NOT_EQUAL, LESSER_THAN, GREATER_THAN,
-                LESS_OR_EQUAL, GREATER_OR_EQUAL,
-                COUT_OPERATOR, CIN_OPERATOR};
+enum Operators {
+                OPERADOR_ASIGNACION, SUMAR, MULTIPLICAR, RESTAR, DIVIDIR,
+                IGUAL, MENOR, MAYOR,
+                MENOR_O_IGUAL, MAYOR_O_IGUAL};
+
+enum ErrorCode { NO_ERROR, UNKNOWN_CHAR, ILLEGAL_ESCAPE_CHAR, END_OF_COMMENT_NOT_FOUND};
 
 
-const string TokenTypesSTR[] = {"UNDEFINED", "LINE_COMMENT", "START_COMMENT", "END_COMMENT",
-                                "IDENTIFICADOR", "KEYWORD", "CHAR", "ENTERO","STRING","opBinario",
-                                "ASIGNACION", "COMMA","PARENTHESIS_IZQUIERDO",
-                                "PARENTHESIS_DERECHO"};
+const string TokenTypesSTR[] = {"ERROR","UNDEFINED", "LINE_COMMENT", "START_COMMENT", "END_COMMENT",
+                                "IDENTIFICADOR", "RESERVADA", "ENTERO","opBinario",
+                                "ASIGNACION","PARENTHESIS_IZQUIERDO",
+                                "PARENTHESIS_DERECHO", "DELIMITADOR"};
 const string ErrorCodeSTR[] = {"NO_ERROR", "UNKNOWN_CHAR", "ILLEGAL_ESCAPE_CHAR", "END_OF_COMMENT_NOT_FOUND"};
 const string KeywordSTR[] = { "SI", "SINO", "instMientras", "instEscribe", "INICIO", "FINAL", "finMientras", "finSi"};
-const string OperatorSTR[] = {"NEGATIVE", "INCREMENT", "DECREASE", "NOT",
-                              "ASIGNMENT_OPERATOR", "ADD", "MULTIPLY", "SUBSTRACT", "DIVIDE",
-                              "EQUAL", "NOT_EQUAL", "LESSER_THAN", "GREATER_THAN",
-                              "LESS_OR_EQUAL", "GREATER_OR_EQUAL",
-                              "COUT_OPERATOR", "CIN_OPERATOR"};
+const string OperatorSTR[] = {
+                              "OPERADOR_ASIGNACION", "SUMAR", "MULTIPLICAR", "RESTAR", "DIVIDIR",
+                              "IGUAL", "MENOR", "MAYOR",
+                              "MENOR_O_IGUAL", "MAYOR_O_IGUAL"};
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+enum Gramatica {programa, secuenciaInst, instruccion, asignacion, expresion,
+                factor, expParentesis, Si, Mientras, Escribe, skip, stop, start};
 
 
 #endif // RESERVED_H

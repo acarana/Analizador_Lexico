@@ -9,7 +9,7 @@ using namespace std;
 
 
 static States State;
-static map<string,Keywords> KeyMap;
+static map<string,Keywords> Llave;
 static map<string,Keywords>::iterator ITE;
 
 struct token

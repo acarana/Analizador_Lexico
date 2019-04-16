@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 #include "Reserved.h"
-#include "Token.h"
+#include "token.h"
 using namespace std;
 
 
@@ -34,6 +34,8 @@ ErrorCode GetToken(string file, int& i, FILE out, token& tokeru)
             if(isalpha(ch))
             {
                 State = IDENTIFIER_FOUND;
+                if(isupper(ch))
+                    tokeru.TokenType = ERROR;
                 break;
             }
 
@@ -46,25 +48,6 @@ ErrorCode GetToken(string file, int& i, FILE out, token& tokeru)
             switch(ch)
             {
 
-              case '\\':
-                State = COMMENT_FOUND1;
-                break;
-
-              case '\'':
-
-                tokeru.TokenString.pop_back();
-                State = CHAR_FOUND1;
-                break;
-
-              case '\"':
-                tokeru.TokenString.pop_back();
-                State = STRING_FOUND1;
-                break;
-
-              case ',':
-                State = END;
-                tokeru.TokenType = COMMA;
-                break;
 
             case ' ':
                tokeru.TokenString.pop_back();
@@ -74,6 +57,10 @@ ErrorCode GetToken(string file, int& i, FILE out, token& tokeru)
               tokeru.TokenString.pop_back();
                 break;
 
+              case ';':
+                State = END;
+                tokeru.TokenType = DELIMITADOR;
+              break;
 
               case '(':
                 State = END;
@@ -102,8 +89,15 @@ ErrorCode GetToken(string file, int& i, FILE out, token& tokeru)
 //---------------------------------------------------------------------------
 
         case IDENTIFIER_FOUND:
-            if(isalnum(ch))
+            if (isupper(ch))
+            {
                 State = IDENTIFIER_FOUND;
+                tokeru.TokenType = ERROR;
+            }
+            else if(isalnum(ch))
+                {
+                    State = IDENTIFIER_FOUND;
+                }
             else
             {
                 State = END;
@@ -111,15 +105,16 @@ ErrorCode GetToken(string file, int& i, FILE out, token& tokeru)
                 ITE = Llave.find(tokeru.TokenString);
 
                 if(ITE == Llave.end())
-                    tokeru.TokenType = IDENTIFICADOR;
+                  {
+                    if(tokeru.TokenType != ERROR)
+                       tokeru.TokenType = IDENTIFICADOR;
+                  }
                 else
                 {
-                    tokeru.TokenType = KEYWORD;
+                    tokeru.TokenType = RESERVADA;
                     tokeru.keyID = (Keywords)ITE->second;
                 }
             }
-            if(tokeru.keyID == '(' )
-                tokeru.TokenType = PARENTHESIS_IZQUIERDO;
             break;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -132,7 +127,11 @@ ErrorCode GetToken(string file, int& i, FILE out, token& tokeru)
                 State = END;
                 tokeru.TokenString.pop_back();
 
-                tokeru.TokenType = ENTERO;
+                if(isdigit(tokeru.TokenString[0]) && isdigit(tokeru.TokenString[1]))
+                   tokeru.TokenType = ENTERO;
+
+                else
+                   tokeru.TokenType = ERROR;
             }
             break;
 
@@ -161,137 +160,35 @@ ErrorCode GetToken(string file, int& i, FILE out, token& tokeru)
 
 //---------------------------------------------------------------------------
 
-        case CHAR_FOUND1:
-            if(ch == '\'')
-            {
-                State = END;
-                tokeru.TokenString.pop_back();
 
-                tokeru.charvariable = '\0';
-                tokeru.TokenType = CHAR;
-            }
-            else
-            {
-                if(isprint(ch))
-                    State = CHAR_FOUND2;
-                else
-                    return UNKNOWN_CHAR;
-            };
-            break;
-
-        case CHAR_FOUND2:
-            if(ch == '\'')
-            {
-                State = END;
-                tokeru.TokenString.pop_back();
-
-                tokeru.TokenType = CHAR;
-            }
-            break;
 
 //---------------------------------------------------------------------------
 
-        case STRING_FOUND1:
-            if(ch == '\"')
-            {
-                State = END;
-                tokeru.TokenString.pop_back();
-                tokeru.TokenType = STRING;
-                break;
-            }
 
-
-            if(ch == '\\')
-            {
-                State = STRING_ESCAPE;
-                tokeru.TokenString.pop_back();
-
-                break;
-            }
-
-
-
-        case STRING_ESCAPE:
-            if(ch == 'n')
-            {
-                tokeru.TokenString.pop_back();
-
-                State = STRING_FOUND1;
-                tokeru.TokenString += '\n';
-            }
-            else
-                return ILLEGAL_ESCAPE_CHAR;
-            break;
 
 ///////////////////////////////////////////////////////////////////////////
         case OPERATOR_FOUND:
             switch(tokeru.TokenString[0])
             {
-              case '!':
-                if(ch == '=')
-                {
-                    State = END;
-                    tokeru.TokenType = opBinario;
-                    tokeru.operatorID = NOT_EQUAL;
-                }
-                else
-                {
-                    State = END;
-                    tokeru.TokenType = opBinario;
-                    tokeru.operatorID = NOT;
-                }
-                break;
 
               case '+':
-                if(ch == '=')
-                {
                     State = END;
                     tokeru.TokenType = opBinario;
-                    tokeru.operatorID = INCREMENT;
-                }
-                else
-                {
-                    State = END;
-                    tokeru.TokenType = opBinario;
-                    tokeru.operatorID = ADD;
-                }
+                    tokeru.operatorID = SUMAR;
+
                 break;
 
               case '-':
-                if(ch == '=')
-                {
-                    State = END;
-                    tokeru.TokenType = opBinario;
-                    tokeru.operatorID = DECREASE;
-                }
-                else
-                {
-
-
-                     if(isdigit(ch))
-                     {
-
-                                State = END;
-                                tokeru.TokenString.pop_back();
-                                tokeru.TokenType = opBinario;
-                                tokeru.operatorID = NEGATIVE;
-                                i--;
-
-                    }
-                    else
-                    {
-                        State = END;
-                        tokeru.TokenType = opBinario;
-                        tokeru.operatorID = SUBSTRACT;
-                    }
-                }
+                     State = END;
+                     tokeru.TokenType = opBinario;
+                     tokeru.operatorID = RESTAR;
                 break;
 
               case '*':
 
                     State = END;
                     tokeru.TokenType = opBinario;
-                    tokeru.operatorID = MULTIPLY;
+                    tokeru.operatorID = MULTIPLICAR;
 
                 break;
 
@@ -320,7 +217,7 @@ ErrorCode GetToken(string file, int& i, FILE out, token& tokeru)
 
                                        State = END;
                                       tokeru.TokenType = opBinario;
-                                      tokeru.operatorID = DIVIDE;
+                                      tokeru.operatorID = DIVIDIR;
                                    }
                               }
 
@@ -332,13 +229,13 @@ ErrorCode GetToken(string file, int& i, FILE out, token& tokeru)
                 {
                     State = END;
                     tokeru.TokenType = opBinario;
-                    tokeru.operatorID = EQUAL;
+                    tokeru.operatorID = IGUAL;
                 }
                 else
                 {
                     State = END;
                     tokeru.TokenType = ASIGNACION;
-                    tokeru.operatorID = ASIGNMENT_OPERATOR;
+                    tokeru.operatorID = OPERADOR_ASIGNACION;
                 }
                 break;
 
@@ -347,22 +244,14 @@ ErrorCode GetToken(string file, int& i, FILE out, token& tokeru)
                 {
                     State = END;
                     tokeru.TokenType = opBinario;
-                    tokeru.operatorID = LESS_OR_EQUAL;
+                    tokeru.operatorID = MENOR_O_IGUAL;
                 }
                 else
                 {
-                    if(ch == '<')
-                    {
-                        State = END;
-                        tokeru.TokenType = opBinario;
-                        tokeru.operatorID = COUT_OPERATOR;
-                    }
-                    else
-                    {
-                        State = END;
-                        tokeru.TokenType = opBinario;
-                        tokeru.operatorID = LESSER_THAN;
-                    }
+                    State = END;
+                    tokeru.TokenType = opBinario;
+                    tokeru.operatorID = MENOR;
+
                 }
                 break;
 
@@ -371,22 +260,13 @@ ErrorCode GetToken(string file, int& i, FILE out, token& tokeru)
                 {
                     State = END;
                     tokeru.TokenType = opBinario;
-                    tokeru.operatorID = GREATER_OR_EQUAL;
+                    tokeru.operatorID = MAYOR_O_IGUAL;
                 }
                 else
                 {
-                    if(ch == '>')
-                    {
-                        State = END;
-                        tokeru.TokenType = opBinario;
-                        tokeru.operatorID = CIN_OPERATOR;
-                    }
-                    else
-                    {
-                        State = END;
-                        tokeru.TokenType = opBinario;
-                        tokeru.operatorID = GREATER_THAN;
-                    }
+                    State = END;
+                    tokeru.TokenType = opBinario;
+                    tokeru.operatorID = MAYOR;
                 }
                 break;
             }
@@ -404,14 +284,14 @@ ErrorCode GetToken(string file, int& i, FILE out, token& tokeru)
                 {
                     case opBinario :
 
-                            str =  tokeru.TokenString + "\t \t "+ TokenTypesSTR[tokeru.TokenType] + "\t \t  " + OperatorSTR[tokeru.operatorID]  + "\n";
+                            str =  tokeru.TokenString + "\t"+ TokenTypesSTR[tokeru.TokenType] + "\t" + OperatorSTR[tokeru.operatorID]  + "\n";
                             break;
-                     case KEYWORD :
+                     case RESERVADA :
 
-                            str = tokeru.TokenString + " \t \t "+TokenTypesSTR[tokeru.TokenType] + "\t \t " + KeywordSTR[tokeru.keyID]+" \n" ;
+                            str = tokeru.TokenString + " \t"+TokenTypesSTR[tokeru.TokenType] + "\t" + KeywordSTR[tokeru.keyID]+" \n" ;
                             break;
                      case ASIGNACION :
-                         str =  tokeru.TokenString + " \t \t "+ TokenTypesSTR[tokeru.TokenType] + "\t \t " + OperatorSTR[tokeru.operatorID]  + "\n";
+                         str =  tokeru.TokenString + " \t"+ TokenTypesSTR[tokeru.TokenType] + "\t" + OperatorSTR[tokeru.operatorID]  + "\n";
                          break ;
                      case START_COMMENT:
                          break;
@@ -423,7 +303,7 @@ ErrorCode GetToken(string file, int& i, FILE out, token& tokeru)
                      default :
 
 
-                            str =  tokeru.TokenString+ "\t \t " + TokenTypesSTR[tokeru.TokenType] + " \n" ;
+                            str =  tokeru.TokenString+ "\t" + TokenTypesSTR[tokeru.TokenType] + " \n" ;
                             break;
                 }
    pFile = fopen ("tokens.txt","a");
