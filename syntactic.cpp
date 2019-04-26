@@ -23,7 +23,7 @@ void Analyze()
     switch(grammar)
       {
          case programa:
-             grammar = start;
+             grammar = secuenciaInst;
              temp = tok.front();
              temp2 = tok.back();
              if(temp.ID!="INICIO")
@@ -34,16 +34,11 @@ void Analyze()
              {
                  cout << "Error, final no definido" << endl;
              }
-             else
-             {
-                 cout << "Inicio y final definido" << endl;
-             }
         break;
 
-         case start:
+         case secuenciaInst:
               temp = *it;
-              if(temp.ID == "instMientras" || temp.ID == "instEscribe"
-                      || temp.ID == "SI" || temp.tokenType == "ASIGNACION")
+              if(IsInstruccion(temp))
                   Instruccion(temp,it);
 
 
@@ -57,13 +52,20 @@ void Analyze()
     ++it;
     }
 
-
+/*
     for(auto it = tok.begin();it != tok.end();++it)
     {
         cout << it->tokenString << ' ' << it->tokenType << ' ' << it->ID << endl;
     }
-
+*/
 }
+
+bool IsInstruccion(Grammar temp)
+{
+    return(temp.ID == "instMientras" || temp.ID == "instEscribe"
+            || temp.ID == "SI" || temp.tokenType == "ASIGNACION");
+}
+
 
 void Instruccion(Grammar temp, vector<Grammar>::iterator& it)
 {
@@ -72,26 +74,62 @@ void Instruccion(Grammar temp, vector<Grammar>::iterator& it)
       {
          mientras(temp,it);
       }
+     else if(temp.tokenType == "ASIGNACION")
+     {
+         Asignacion(temp,it);
+     }
+     else if(temp.ID == "instEscribe")
+     {
+         escribe(temp,it);
+     }
+     else if(temp.ID == "SI")
+     {
+         si(temp,it);
+     }
+
 }
 
 bool mientras(Grammar temp, vector<Grammar>::iterator& it)
 {
   vector<Grammar>::iterator eto;
-  string id;
   eto=it;
   temp=*eto;
-  if(Parentesis(temp,it,temp.ID))
-   {
+  bool instFound=false;
+  Parentesis(temp,it,temp.ID);
+
     for(eto; eto != tok.end();++eto)
     {
         temp = *eto;
-        if(temp.ID=="finMientras")
+        if(!instFound && (temp.tokenType == "PARENTHESIS_DERECHO"))
+        {
+            instFound=true;
+            auto ato = eto;
+
+            for(int i=0;i<2;i++)
+            {
+                ato++;
+                temp=*ato;
+                if(IsInstruccion(temp))
+                {
+                    Instruccion(temp,ato);
+                    break;
+                }
+
+                else if(i==1)
+                {
+                    cout << "Error, se espera instruccion despues de WHILE" << endl;
+                }
+
+            }
+        }
+
+        else if(temp.ID=="finMientras")
         {
             return true;
         }
     }
     cout << "Error, finmientras no definido" << endl;
-   }
+
   return false;
 }
 
@@ -130,7 +168,7 @@ bool Parentesis(Grammar temp, vector<Grammar>::iterator& it,string& id)
 
 
 
-bool Expresion(Grammar temp, vector<Grammar>::iterator it,string& id)
+bool Expresion(Grammar temp, vector<Grammar>::iterator& it,string& id)
 {
     vector<Grammar>::iterator eto;
     bool factor=false, op=false;
@@ -184,7 +222,120 @@ bool Expresion(Grammar temp, vector<Grammar>::iterator it,string& id)
     }
     return (factor || op);
 }
-//Hacer funcion de Escribe y SI///
+
+bool Asignacion(Grammar temp, vector<Grammar>::iterator it)
+{
+    vector<Grammar>::iterator eto;
+    bool asignacion =false, identificador=true,delimitador=false;
+    eto=it;
+
+
+    eto--;
+    temp=*eto;
+    if(temp.tokenType == "IDENTIFICADOR")
+     identificador=true;
+    else
+    {
+        cout << "Error, identificador esperado antes de operador de asignacion" << endl;
+    }
+
+    eto+=2;
+    temp=*eto;
+    if((temp.tokenType == "IDENTIFICADOR") || (temp.tokenType == "ENTERO"))
+        asignacion=true;
+    else
+    {
+        cout << "Error, identificador o entero esperado despues de operador de asignacion" << endl;
+    }
+
+    if(asignacion && identificador)
+    {
+     eto++;
+     temp=*eto;
+     if(temp.tokenType == "DELIMITADOR")
+         delimitador=true;
+     else
+     {
+         cout << "Error, delimitador no encontrado" << endl;
+     }
+    }
+    return(asignacion && identificador && delimitador);
+}
+
+bool escribe(Grammar temp, vector<Grammar>::iterator& it)
+{
+    return(Parentesis(temp,it,temp.ID));
+}
+
+
+
+bool si(Grammar temp, vector<Grammar>::iterator& it)
+{
+    vector<Grammar>::iterator eto;
+    eto=it;
+    temp=*eto;
+    bool instFound=false;
+    Parentesis(temp,it,temp.ID);
+
+      for(eto; eto != tok.end();++eto)
+      {
+          temp = *eto;
+
+          if(!instFound && (temp.tokenType == "PARENTHESIS_DERECHO"))
+          {
+              instFound=true;
+              auto ato = eto;
+
+              for(int i=0;i<2;i++)
+              {
+                  ato++;
+                  temp=*ato;
+                  if(IsInstruccion(temp))
+                  {
+                      Instruccion(temp,ato);
+                      break;
+                  }
+
+                  else if(i==1)
+                  {
+                      cout << "Error, se espera instruccion despues de SI" << endl;
+                  }
+
+              }
+          }
+
+
+          else if(temp.ID=="finSi")
+          {
+              return true;
+          }
+          else if(temp.ID=="SINO")
+          {
+              auto ito = eto;
+
+              for(int i=0;i<2;i++)
+              {
+                  ito++;
+                  temp=*ito;
+                  if(IsInstruccion(temp))
+                  {
+                      Instruccion(temp,ito);
+                      break;
+                  }
+
+                  else if(i==1)
+                  {
+                      cout << "Error, se espera instruccion despues de SINO" << endl;
+                  }
+
+              }
+          }
+      }
+      cout << "Error, finSi no definido" << endl;
+
+    return false;
+}
+
 
 void ReadToken(string& file)
 {

@@ -34,8 +34,7 @@ const string OperatorSTR[] = {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-enum Gramatica {programa, secuenciaInst, instruccion, asignacion, expresion,
-                factor, expParentesis, Si, Mientras, Escribe, skip, stop, start};
+enum Gramatica {programa, secuenciaInst};
 
 
 #endif // RESERVED_H
